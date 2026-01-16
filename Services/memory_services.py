@@ -18,24 +18,15 @@ async def SetSessionID():
     Session_ID = session_id
     return session_id
 
-async def get_session_id():
-    """Retrieves the current session ID."""
-    global Session_ID
-    if Session_ID is None:
-        await SetSessionID()
-    return Session_ID
-
-async def add_Prompt(data):
+async def add_Prompt(data,SSID):
     """Adds a prompt dictionary to the session store."""
-    session_id = await get_session_id()
-    Memory_store.add(session_id, data)
-    logger.info("Prompt added to session store", extra={"session_id": session_id, "dict_id": data.get("id")})
+    Memory_store.add(SSID, data)
+    logger.info("Prompt added to session store", extra={"session_id": SSID, "dict_id": data.get("id")})
 
-async def get_all_start_methods():
+async def get_all_start_methods(SSID):
     """Retrieves all stored dictionaries for the given session ID."""
-    session_id = await get_session_id()
-    dicts = Memory_store.get_latest(session_id)
-    logger.info("Retrieved all start methods", extra={"session_id": session_id, "count": len(dicts)})
+    dicts = Memory_store.get_latest(SSID)
+    logger.info("Retrieved all start methods", extra={"session_id": SSID, "count": len(dicts)})
     return dicts
 
 

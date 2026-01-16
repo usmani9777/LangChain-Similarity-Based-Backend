@@ -7,7 +7,7 @@ from models.Response import Response
 import shutil
 from Services.convert_to_txt import save_text_to_txt
 from models.Text_Upload import TextUploadRequest
-from Services.memory_services import add_Prompt, get_all_start_methods, get_session_id,SetSessionID
+from Services.memory_services import add_Prompt, get_all_start_methods,SetSessionID
 from Services.Rag import rag_answer, add_data, retrieve_context,process_file_background
 import logging
 
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/user", tags=["User"])
 
 UPLOAD_DIR = Path("Storage")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-
+Session_ID: str= None
 
 @router.get("/info")
 async def get_user_info():
@@ -35,11 +35,13 @@ async def prompt_user(
 async def prompt_with_rag(
     question: str = Query(..., min_length=3)
 ):
+    global Session_ID
     try:
+        if Session_ID == None: Session_ID = SetSessionID()
         logging.info("RAG prompt endpoint called", extra={"question": question})
-        Prompts =await get_all_start_methods()
+        Prompts =await get_all_start_methods(Session_ID)
         answer =await rag_answer(question,Prompts)
-        await add_Prompt(answer.model_dump())
+        await add_Prompt(answer.model_dump(),Session_ID)
         return answer
     except Exception as e:
         logging.exception("RAG processing failed", extra={"error": str(e)})
@@ -52,9 +54,11 @@ async def prompt_with_rag(
 async def retrieval_check(
     question: str = Query(..., min_length=3)
 ):
+    global Session_ID
     try:
+        if Session_ID == None: Session_ID = SetSessionID()
         logging.info("Retrieval endpoint called", extra={"question": question})
-        results = await retrieve_context(question)
+        results = await retrieve_context(question,)
         return {"results": results}
     except Exception as e:
         logging.exception("Retrieval failed", extra={"error": str(e)})
@@ -110,44 +114,6 @@ async def upload_file(
     finally:
         await file.close()
     
-    
-# @router.post("/add-file", status_code=201)
-# async def upload_file(file: UploadFile = File(...)):
-#     # 1. Validate file type
-#     if not file.filename.lower().endswith(".txt"):
-#         raise HTTPException(
-#             status_code=400,
-#             detail="Only .txt files are allowed"
-#         )
-#     files = get_unique_filename(UPLOAD_DIR, file.filename)
-#     file_path = UPLOAD_DIR / files
-
-#     try:
-#         logging.info("File upload called", extra={"filename": file.filename})
-#         # 2. Save file safely
-#         with file_path.open("wb") as buffer:
-#             shutil.copyfileobj(file.file, buffer)
-
-#         # 3. Add to vector DB
-#         success = add_data(str(files))
-#         if not success:
-#             raise RuntimeError("Vector DB ingestion failed")
-
-#         return {
-#             "message": "File uploaded and indexed successfully",
-#             "filename": file.filename
-#         }
-
-#     except Exception as e:
-#         logging.exception("File upload failed", extra={"error": str(e)})
-#         raise HTTPException(
-#             status_code=500,
-#             detail=str(e)
-#         )
-
-#     finally:
-#         await file.close()
-
 
 @router.post("/convert-and-add", status_code=201)
 async def convert_and_upload(payload: TextUploadRequest):
@@ -203,8 +169,9 @@ async def list_storage_files(FileName: str):
 @router.post("/set-session", status_code=200)
 async def set_session():
     try:
+        global Session_ID
         logging.info("Set session endpoint called")
-        await SetSessionID()
+        Session_ID = await SetSessionID()
         return {"message": "Session ID set successfully"}
     except Exception as e:
         logging.exception("Setting session ID failed", extra={"error": str(e)})
@@ -216,8 +183,9 @@ async def set_session():
 @router.post("/prompt/GetPrompts")
 async def GetPrompts():
     try:
+        global Session_ID
         logging.info("Checking Prmpts retrival",)
-        Prompts =await get_all_start_methods()
+        Prompts = await get_all_start_methods(Session_ID)
         return Prompts
     except Exception as e:
         logging.exception("RAG processing failed", extra={"error": str(e)})
