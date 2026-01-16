@@ -1,25 +1,24 @@
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+from zipfile import Path
 
-LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 # Get the path to the user's Desktop
-DESKTOP_PATH = os.path.join(os.path.expanduser("~"), "Desktop")
-LOG_FILE = r"C:\Users\nayal\OneDrive\Desktop\Codes\app.log"
-
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+LOG_FILE = os.getenv("LOG_FILE", "app.log")
 
 LOG_FORMAT = (
     "%(asctime)s | %(levelname)s | "
-    "%(name)s | %(message)s"
+    "%(name)s | %(message)s" 
 )
 
 def setup_logging():
-    log_dir = os.path.dirname(LOG_FILE)
+    # log_dir = os.path.dirname(LOG_FILE)
 
-    # 3. Create the folder if it doesn't exist
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-        print(f"Created missing directory: {log_dir}")
+    # # 3. Create the folder if it doesn't exist
+    # if not os.path.exists(log_dir):
+    #     os.makedirs(log_dir)
+    #     print(f"Created missing directory: {log_dir}")
 
     logging.getLogger().handlers.clear()
 

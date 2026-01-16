@@ -100,8 +100,10 @@ prompt_rag = ChatPromptTemplate.from_messages([
         "2. If the answer is not explicitly found in the Article, respond with:\n"
         "'The requested information is not available in the provided documents.'\n"
         "3. Do NOT use outside knowledge or assumptions.\n\n"
+        "These Are User Previouse Prompts also take them into account {Previous_Prompts} also take them in account when answering"
         "FORMAT:\n"
         "{format_instructions}"
+        
     ),
     (
         "user",
@@ -129,6 +131,7 @@ def initialize_vector_store() -> TextRAGVectorStore:
         return TextRAGVectorStore(rebuild=False)
 
 
+    
 rag_store = initialize_vector_store()
 
 async def add_data(filename: str) -> bool:
@@ -158,7 +161,7 @@ async def retrieve_context(question: str) -> str:
         print(f"[ERROR] Retrieval failed: {e}")
         return ""
 
-async def rag_answer(question: str) -> Response | dict:
+async def rag_answer(question: str , prompts:dict) -> Response | dict:
     """
     Full RAG pipeline:
     1. Retrieve context
@@ -178,6 +181,7 @@ async def rag_answer(question: str) -> Response | dict:
 
     return rag_chain.invoke({
         "question": question,
+        "Previous_Prompts":prompts,
         "Article": article,
         "format_instructions": parser.get_format_instructions()
     })
@@ -194,3 +198,5 @@ async def process_file_background(filename: str):
     if not success:
         # Log instead of raising exception
         logger.error(f"Background ingestion failed for file: {filename}")
+        
+

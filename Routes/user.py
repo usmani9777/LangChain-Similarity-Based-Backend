@@ -7,7 +7,7 @@ from models.Response import Response
 import shutil
 from Services.convert_to_txt import save_text_to_txt
 from models.Text_Upload import TextUploadRequest
-
+from Services.memory_services import add_Prompt, get_all_start_methods, get_session_id,SetSessionID
 from Services.Rag import rag_answer, add_data, retrieve_context,process_file_background
 import logging
 
@@ -37,7 +37,9 @@ async def prompt_with_rag(
 ):
     try:
         logging.info("RAG prompt endpoint called", extra={"question": question})
-        answer =await rag_answer(question)
+        Prompts =await get_all_start_methods()
+        answer =await rag_answer(question,Prompts)
+        await add_Prompt(answer.model_dump())
         return answer
     except Exception as e:
         logging.exception("RAG processing failed", extra={"error": str(e)})
@@ -87,7 +89,7 @@ async def upload_file(
         with file_path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        # ✅ Correct background task call
+        
         background_tasks.add_task(
             process_file_background,
             str(file_path)
@@ -187,4 +189,39 @@ async def list_storage_files(FileName: str):
         raise HTTPException(
             status_code=500,
             detail=f"Failed to list files: {str(e)}"
+        )
+        
+        
+# async def SetSessionID():
+#     """Sets a unique session ID for the RAG store."""
+#     import uuid
+#     session_id = str(uuid.uuid4())
+#     rag_store.set_session_id(session_id)
+#     logger.info(f"Session ID set to {session_id}")
+#     return session_id
+
+@router.post("/set-session", status_code=200)
+async def set_session():
+    try:
+        logging.info("Set session endpoint called")
+        await SetSessionID()
+        return {"message": "Session ID set successfully"}
+    except Exception as e:
+        logging.exception("Setting session ID failed", extra={"error": str(e)})
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to set session ID: {str(e)}"
+        )
+
+@router.post("/prompt/GetPrompts")
+async def GetPrompts():
+    try:
+        logging.info("Checking Prmpts retrival",)
+        Prompts =await get_all_start_methods()
+        return Prompts
+    except Exception as e:
+        logging.exception("RAG processing failed", extra={"error": str(e)})
+        raise HTTPException(
+            status_code=500,
+            detail=f"RAG processing failed: {str(e)}"
         )
