@@ -135,9 +135,12 @@ async def add_data(filename: str) -> bool:
     """
     Adds a text file to the vector database.
     """
-    logger.info("Adding data to vector store", extra={"filename": filename})
+    logger.info(f"Adding data to vector store{filename}")
+    
     try:
-        rag_store.add_data(f"Storage/{filename}")
+        if not filename.startswith(("Storage")):
+            filename = f"Storage/{filename}"
+        rag_store.add_data(filename)
         return True
     except Exception as e:
         print(f"[ERROR] Failed to add data: {e}")
@@ -178,3 +181,16 @@ async def rag_answer(question: str) -> Response | dict:
         "Article": article,
         "format_instructions": parser.get_format_instructions()
     })
+
+async def process_file_background(filename: str):
+    """Background task to process and ingest file into vector DB.
+    Args:
+        filename (str): Name of the file to process
+    returns:
+        None"""
+    logger.exception(f"Background file ingestion started {filename}", extra={"File to debug": filename})
+        
+    success = await add_data(filename)
+    if not success:
+        # Log instead of raising exception
+        logger.error(f"Background ingestion failed for file: {filename}")
