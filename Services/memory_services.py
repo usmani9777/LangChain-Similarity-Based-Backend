@@ -1,24 +1,30 @@
 from pyparsing import Optional
 from logging import getLogger
 from fastapi import Request
-from Services.Insession_Memory import DictSessionStore
-
+from Services.Insession_Memory import RedisDictSessionStore
+from models.Response import Response
+import os
 logger = getLogger(__name__)
-Memory_store = DictSessionStore()
+from dotenv import load_dotenv
+load_dotenv()
+
+
+
+redis_url = os.getenv("redis_url")
+ttl_seconds = os.getenv("ttl_seconds")
+key_prefix = os.getenv("key_prefix")
+
+Memory_store = RedisDictSessionStore(
+        redis_url = redis_url,
+        max_items  = 20,              # ✅ N = 20
+        ttl_seconds  = ttl_seconds,           # ✅ TTL = 1 hour
+        key_prefix = key_prefix)
 
 Session_ID: str= None
 
-async def SetSessionID():
-    """Sets a unique session ID for the RAG store."""
-    global Session_ID
-    import uuid
-    session_id = str(uuid.uuid4())
-    
-    logger.info(f"Session ID set to {session_id}")
-    Session_ID = session_id
-    return session_id
 
-async def add_Prompt(data,SSID):
+
+async def add_Prompt(data:Response,SSID):
     """Adds a prompt dictionary to the session store."""
     Memory_store.add(SSID, data)
     logger.info("Prompt added to session store", extra={"session_id": SSID, "dict_id": data.get("id")})
@@ -36,7 +42,7 @@ async def Get_ALL():
 async def Get_all_keys():
     dicts = Memory_store.get_all_keys()
     return dicts
-    
+
 
 def get_session_id(request: Request) -> str:
     return request.state.session_id

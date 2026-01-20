@@ -53,8 +53,8 @@ async def session_middleware(request: Request, call_next):
     # ✅ Only set cookie if it was newly created
     if SESSION_COOKIE not in request.cookies:
         response.set_cookie(
-            key=SESSION_COOKIE,
-            value=session_id,
+            key= SESSION_COOKIE,
+            value= session_id,
             httponly=True,
             samesite="lax"
         )

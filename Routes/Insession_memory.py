@@ -4,8 +4,7 @@ from Services.memory_services import get_all_start_methods , get_session_id , Ge
 import logging
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/Session", tags=["Session"])
-        
+router = APIRouter(prefix="/Session", tags=["Session"])  
 
 @router.post("/prompt/GetPrompts")
 async def GetPrompts(Session_ID : str = Depends(get_session_id)):
@@ -20,7 +19,6 @@ async def GetPrompts(Session_ID : str = Depends(get_session_id)):
             status_code=500,
             detail=f"RAG processing failed: {str(e)}"
         )
- 
 
 @router.post("/prompt/Get_All")
 async def GETALL():
@@ -63,4 +61,6 @@ async def GETALL():
         )        
 # async def Get_all_keys():
 #     dicts = Memory_store.get_all_keys()
+#     return dicts 
+
     
