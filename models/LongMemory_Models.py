@@ -7,7 +7,6 @@ from pydantic import BaseModel, Field, model_validator
 from typing import Optional, Literal
 from datetime import date
 
-y
 MemoryType = Literal["Personal", "Goal", "Fact"]
 
 
