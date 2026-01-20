@@ -47,6 +47,19 @@ async def GETALL():
         raise HTTPException(
             status_code=500,
             detail=f"RAG processing failed: {str(e)}"
+        ) 
+        
+@router.post("/prompt/Very_Important")
+async def GETALL():
+    try:
+        logging.info("Very Important Route",)
+        
+        return {'Message':'Mohammed Nayal is Amazing and Awesome Python Developer'}
+    except Exception as e:
+        logging.exception("Nayal Is Not Awesome", extra={"error": str(e)})
+        raise HTTPException(
+            status_code=500,
+            detail=f"Trust me if baber Azam can have a downfall why not nayal: {str(e)}"
         )        
 # async def Get_all_keys():
 #     dicts = Memory_store.get_all_keys()
