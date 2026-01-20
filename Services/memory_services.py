@@ -1,6 +1,6 @@
 from pyparsing import Optional
 from logging import getLogger
-
+from fastapi import Request
 from Services.Insession_Memory import DictSessionStore
 
 logger = getLogger(__name__)
@@ -28,6 +28,18 @@ async def get_all_start_methods(SSID):
     dicts = Memory_store.get_latest(SSID)
     logger.info("Retrieved all start methods", extra={"session_id": SSID, "count": len(dicts)})
     return dicts
+
+async def Get_ALL():
+    dicts = Memory_store.get_all_items()
+    return dicts
+
+async def Get_all_keys():
+    dicts = Memory_store.get_all_keys()
+    return dicts
+    
+
+def get_session_id(request: Request) -> str:
+    return request.state.session_id
 
 
 

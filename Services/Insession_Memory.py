@@ -80,7 +80,14 @@ class DictSessionStore:
             raise ValueError("session_id cannot be empty")
 
         return list(self._store.get(session_id, []))
+    
+    def get_all_items(self):
+        return self._store.items()
+    
+    def get_all_keys(self) -> tuple:
+        return tuple(self._store.keys())
 
+    
 
 # store = DictSessionStore()
 
