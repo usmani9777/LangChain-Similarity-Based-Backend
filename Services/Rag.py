@@ -1,4 +1,9 @@
+import logging
 from typing import List
+from Services.LongTermMemory import Create_memory, process_query
+from Services.memory_services import get_all_start_methods
+from models.LongMemory_Models import Memory
+from models.Query_Payload import RagRequest, RedisQuery
 from models.Response import Response
 from langchain_core.output_parsers import PydanticOutputParser
 from core.prompt import prompt_rag
@@ -38,7 +43,7 @@ async def retrieve_context(question: str) -> str:
         print(f"[ERROR] Retrieval failed: {e}")
         return ""
 
-async def rag_answer(question: str , prompts:dict , memories:List) -> Response | dict:
+async def rag_answer(Payload:RagRequest) -> Response | dict:
     """
     Full RAG pipeline:
     1. Retrieve context
@@ -46,30 +51,38 @@ async def rag_answer(question: str , prompts:dict , memories:List) -> Response |
     3. Run LLM with strict grounding
     4. Parse structured output
     """
-    logger.info("Starting RAG pipeline", extra={"question": question})
-    print(prompts,memories,question)
-    article =await retrieve_context(question)
+    logger.info("Starting RAG pipeline", extra={"question": Payload.question})
+
+    article =await retrieve_context(Payload.question)
 
     if not article:
         return {
             "Article": "",
             "Answer": "The requested information is not available in the provided documents."
         }
-    logger.info(f"Prompt {prompts}")
-    
-    # Prompts = await get_all_start_methods(Session_ID)
-    # memories = process_query(Session_ID, Session_ID, question)
-    # answer = await rag_answer(question,Prompts,memories)
-    # logger.info(f"Answer given by the rag {answer}")
-    # await add_Prompt(answer.model_dump(),Session_ID)
+    logger.info(f"Prompt call prompt")
+    redis_query = RedisQuery(user_id=Payload.Session_ID,session_id=Payload.Session_ID,query=Payload.question)
+   
+    memory_type , memories = await process_query(redis_query)
+    Prompts = await get_all_start_methods(Payload.Session_ID)
 
-    return rag_chain.invoke({
-        "question": question,
-        "Previous_Prompts":prompts,
+    answer =  rag_chain.invoke({
+        "question": Payload.question,
+        "Previous_Prompts":Prompts,
         "Article": article,
         "format_instructions": parser.get_format_instructions(),
         "Memories":memories
     })
+    if (answer.Saving != "" or len(answer.Saving) >= 1) and memory_type != None: 
+        memory = Memory(
+            user_id= Payload.Session_ID,
+            session_id= Payload.Session_ID,
+            memory_type = memory_type,
+            text= 'Question: ' + answer.Question + '  ' + "Answer  " +  answer.Saving 
+        )
+        await Create_memory(memory)
+    
+    return answer
 
 async def process_file_background(filename: str):
     """Background task to process and ingest file into vector DB.

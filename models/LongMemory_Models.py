@@ -77,6 +77,12 @@ def get_now_timestamp():
     # Returns current time as an integer (Unix Epoch)
     return int(time.time())
 
+class Create_Memory(BaseModel):
+    user_id: Optional[str] = Field(None, min_length=4)
+    session_id: str = Field(..., min_length=10, max_length=2000)
+    memory_type: MemoryType = Field(...)
+    text: str = Field(..., min_length=5, max_length=1000)
+
 class Memory(BaseModel):
     user_id: Optional[str] = Field(None, min_length=4)
     session_id: str = Field(..., min_length=10, max_length=2000)

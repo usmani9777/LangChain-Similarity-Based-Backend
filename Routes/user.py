@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, Query,Depends
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query,Depends
 from models.Response import Response
-from Services.memory_services import add_Prompt, get_all_start_methods,get_session_id
+from Services.memory_services import add_Prompt,get_session_id
 from Services.Rag import rag_answer, retrieve_context
 import logging
-from Services.LongTermMemory import process_query
+from models.Query_Payload import RagRequest
+
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/user", tags=["User"])
 
@@ -24,17 +25,25 @@ async def prompt_user(
 
 @router.post("/prompt/rag" , response_model=Response)
 async def prompt_with_rag(
+    background_tasks: BackgroundTasks,
     question: str = Query(..., min_length=3),
-    Session_ID: str = Depends(get_session_id)
+    Session_ID: str = Depends(get_session_id),
+    
 ):
     try:
-        
         logging.info("RAG prompt endpoint called", extra={"question": question})
-        Prompts = await get_all_start_methods(Session_ID)
-        memories = process_query(Session_ID, Session_ID, question)
-        answer = await rag_answer(question,Prompts,memories)
-        logger.info(f"Answer given by the rag {answer}")
-        await add_Prompt(answer.model_dump(),Session_ID)
+        Request = RagRequest(question= question, Session_ID=Session_ID)
+        answer = await rag_answer(Request)
+        
+        logger.info(f"Answer given by the rag {answer.Saving}")
+        
+        
+        # await add_Prompt(answer.model_dump(),Session_ID)
+        logging.info(f"The User asked the Question and Answer was {answer}")
+        background_tasks.add_task(
+                add_Prompt,
+                answer.model_dump(),
+                Session_ID)
         return answer
             
     except Exception as e:
