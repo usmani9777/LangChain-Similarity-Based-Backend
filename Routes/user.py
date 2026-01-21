@@ -4,7 +4,7 @@ from models.Response import Response
 from Services.memory_services import add_Prompt, get_all_start_methods,get_session_id
 from Services.Rag import rag_answer, retrieve_context
 import logging
-
+from Services.LongTermMemory import process_query
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/user", tags=["User"])
 
@@ -31,8 +31,10 @@ async def prompt_with_rag(
     try:
         
         logging.info("RAG prompt endpoint called", extra={"question": question})
-        Prompts =await get_all_start_methods(Session_ID)
-        answer =await rag_answer(question,Prompts)
+        Prompts = await get_all_start_methods(Session_ID)
+        memories = process_query(Session_ID, Session_ID, question)
+        answer = await rag_answer(question,Prompts,memories)
+        logger.info(f"Answer given by the rag {answer}")
         await add_Prompt(answer.model_dump(),Session_ID)
         return answer
             

@@ -6,18 +6,18 @@ from langchain_chroma.vectorstores import Chroma
 from langchain_community.document_loaders import TextLoader, DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
-import os
+from core.config import settings
 logger = getLogger(__name__)
 class TextRAGVectorStore:
     def __init__(
         self,
         paths: Union[str, List[str]],
-        persist_directory: str = "./chroma_db",
-        embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2",
-        chunk_size: int = 500,
-        chunk_overlap: int = 50,
-        top_k: int = 3,
-        rebuild: bool = False,   # 👈 control re-indexing
+        persist_directory: str = settings.persist_directory,
+        embedding_model: str = settings.embedding_model,
+        chunk_size: int = settings.chunk_size,
+        chunk_overlap: int = settings.chunk_overlap,
+        top_k: int = settings.top_k,
+        rebuild: bool = settings.rebuild, 
     ):
         """Initialize the TextRAGVectorStore.
         Args: 

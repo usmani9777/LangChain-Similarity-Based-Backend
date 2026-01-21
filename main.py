@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from Routes.user import router as user_router
 from Routes.rag import router as rag_router
 from Routes.Insession_memory import router as Insession
-from Services.logging_config import setup_logging
+from core.logging_config import setup_logging
 
 from Middleware.Session_Id import session_middleware
 setup_logging()

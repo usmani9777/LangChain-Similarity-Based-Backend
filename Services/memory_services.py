@@ -1,18 +1,18 @@
 from pyparsing import Optional
 from logging import getLogger
 from fastapi import Request
-from Services.Insession_Memory import RedisDictSessionStore
+from utils.Insession_Memory import RedisDictSessionStore
 from models.Response import Response
-import os
+
 logger = getLogger(__name__)
-from dotenv import load_dotenv
-load_dotenv()
 
 
+from core.config import settings
 
-redis_url = os.getenv("redis_url")
-ttl_seconds = os.getenv("ttl_seconds")
-key_prefix = os.getenv("key_prefix")
+
+redis_url = settings.redis_url
+ttl_seconds = settings.redis_ttl_seconds
+key_prefix = settings.redis_key_prefix
 
 Memory_store = RedisDictSessionStore(
         redis_url = redis_url,

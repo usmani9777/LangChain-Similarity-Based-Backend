@@ -61,26 +61,24 @@
 #     return response.invoke({"question": Question, "format_instructions": parser.get_format_instructions(), "Article": Article})
 
 
-import os
-from dotenv import load_dotenv
-from typing import Optional
+
+from typing import List, Optional
 from models.Response import Response
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
-
-from Services.db import TextRAGVectorStore
+from core.prompt import prompt_rag
+from utils.db import TextRAGVectorStore
 
 from logging import getLogger
 
 logger = getLogger(__name__)
 
+from core.config import settings
 
-load_dotenv()
-
-API_KEY = os.getenv("API_KEY")
-BASE_URL = os.getenv("BASE_URL")
-MODEL_NAME = os.getenv("MODEL_NAME")
+API_KEY = settings.api_key
+BASE_URL = settings.base_url
+MODEL_NAME = settings.model_name
 
 llm = ChatOpenAI(
     model_name=MODEL_NAME,
@@ -91,29 +89,43 @@ llm = ChatOpenAI(
 
 parser = PydanticOutputParser(pydantic_object=Response)
 
-prompt_rag = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "You are an expert Retrieval-Augmented Generation (RAG) assistant.\n\n"
-        "RULES:\n"
-        "1. Answer the user's question using ONLY the provided Article.\n"
-        "2. If the answer is not explicitly found in the Article, respond with:\n"
-        "'The requested information is not available in the provided documents.'\n"
-        "3. Do NOT use outside knowledge or assumptions.\n\n"
-        "These Are User Previouse Prompts also take them into account {Previous_Prompts} also take them in account when answering"
-        "FORMAT:\n"
-        "{format_instructions}"
-        
-    ),
-    (
-        "user",
-        "--- ARTICLE START ---\n"
-        "{Article}\n"
-        "--- ARTICLE END ---\n\n"
-        "QUESTION: {question}"
-    )
-])
 
+
+# prompt_rag = ChatPromptTemplate.from_messages([
+#     (
+#         "system",
+#         "You are an expert RAG assistant. You must answer questions using a combination of "
+#         "the provided Article, User Memories, and Previous Chat History.\n\n"
+        
+#         "### KNOWLEDGE SOURCE PRIORITY:\n"
+#         "1. **Context Synthesis:** Treat the 'Article', 'User Memories', and 'User History' "
+#         "as a single integrated knowledge base. If the answer is in any of these, provide it.\n"
+#         "2. **Specific Recall:** If the user asks about personal details, goals, or facts "
+#         "shared previously, prioritize the 'User Memories' section.\n"
+#         "3. **Tone & Context:** Use 'User History' to ensure continuity in the conversation.\n"
+#         "4. **Strictness:** Only say 'The requested information is not available...' if the "
+#         "answer is missing from ALL provided sections (Article, Memories, and History).\n\n"
+        
+#         "### RULES:\n"
+#         "- Do not make up facts. Use only the provided data.\n"
+#         "- If information in the Article conflicts with User Memories, prioritize the User Memories "
+#         "as the user's personal truth.\n\n"
+        
+#         "### DATA SECTIONS:\n"
+#         "User Memories: {Memories}\n"
+#         "User History: {Previous_Prompts}\n\n"
+        
+#         "### FORMATTING:\n"
+#         "{format_instructions}"
+#     ),
+#     (
+#         "user",
+#         "--- ARTICLE START ---\n"
+#         "{Article}\n"
+#         "--- ARTICLE END ---\n\n"
+#         "QUESTION: {question}"
+#     )
+# ])
 # RAG Chain
 rag_chain = prompt_rag | llm | parser
 
@@ -141,6 +153,7 @@ async def add_data(filename: str) -> bool:
     logger.info(f"Adding data to vector store{filename}")
     
     try:
+        logger.info(f'Data for filename {filename}')
         if not filename.startswith(("Storage")):
             filename = f"Storage/{filename}"
         rag_store.add_data(filename)
@@ -161,7 +174,7 @@ async def retrieve_context(question: str) -> str:
         print(f"[ERROR] Retrieval failed: {e}")
         return ""
 
-async def rag_answer(question: str , prompts:dict) -> Response | dict:
+async def rag_answer(question: str , prompts:dict , memories:List) -> Response | dict:
     """
     Full RAG pipeline:
     1. Retrieve context
@@ -170,7 +183,7 @@ async def rag_answer(question: str , prompts:dict) -> Response | dict:
     4. Parse structured output
     """
     logger.info("Starting RAG pipeline", extra={"question": question})
-
+    print(prompts,memories,question)
     article =await retrieve_context(question)
 
     if not article:
@@ -178,12 +191,14 @@ async def rag_answer(question: str , prompts:dict) -> Response | dict:
             "Article": "",
             "Answer": "The requested information is not available in the provided documents."
         }
+    logger.info(f"Prompt {prompts}")
 
     return rag_chain.invoke({
         "question": question,
         "Previous_Prompts":prompts,
         "Article": article,
-        "format_instructions": parser.get_format_instructions()
+        "format_instructions": parser.get_format_instructions(),
+        "Memories":memories
     })
 
 async def process_file_background(filename: str):

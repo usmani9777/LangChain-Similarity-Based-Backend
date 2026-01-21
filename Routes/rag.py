@@ -1,20 +1,21 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException,BackgroundTasks
 from pathlib import Path
-from Services.File_check import get_unique_filename
+from utils.File_check import get_unique_filename
 import shutil
-from Services.convert_to_txt import save_text_to_txt
+from utils.convert_to_txt import save_text_to_txt
 from models.Text_Upload import TextUploadRequest
 from Services.Rag import add_data ,process_file_background
 import logging
+from core.config import settings
 
 router = APIRouter(prefix="/rag", tags=["RAG"])
 
 logger = logging.getLogger(__name__)
 
 
-UPLOAD_DIR = Path("Storage")
+UPLOAD_DIR = Path(settings.storage_dir)
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-Session_ID: str= None
+
 
  
 
@@ -75,7 +76,7 @@ async def convert_and_upload(payload: TextUploadRequest):
             filename=file_name
         )
 
-        if not add_data(str(file_name)):
+        if not await add_data(str(file_name)):
             raise RuntimeError("Vector DB ingestion failed")
 
         return {
