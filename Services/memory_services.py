@@ -1,28 +1,11 @@
-from pyparsing import Optional
 from logging import getLogger
 from fastapi import Request
-from utils.Insession_Memory import RedisDictSessionStore
 from models.Response import Response
+from core.dependecies import Get_redis
 
 logger = getLogger(__name__)
 
-
-from core.config import settings
-
-
-redis_url = settings.redis_url
-ttl_seconds = settings.redis_ttl_seconds
-key_prefix = settings.redis_key_prefix
-
-Memory_store = RedisDictSessionStore(
-        redis_url = redis_url,
-        max_items  = 20,              # ✅ N = 20
-        ttl_seconds  = ttl_seconds,           # ✅ TTL = 1 hour
-        key_prefix = key_prefix)
-
-Session_ID: str= None
-
-
+Memory_store = Get_redis()
 
 async def add_Prompt(data:Response,SSID):
     """Adds a prompt dictionary to the session store."""

@@ -1,14 +1,11 @@
-from utils.mongo_memory import MongoMemoryStore
-from utils.RuleBasedMemoryClassifier import RuleBasedMemoryClassifier
 from models.LongMemory_Models import Memory
-from core.config import settings
+from core.dependecies import Get_Classifier, Monogo_Memory
 import logging
+
 logger = logging.getLogger(__name__)
 
-classifier = RuleBasedMemoryClassifier()
-store = MongoMemoryStore(settings.mongo_url)
-
 def process_query(user_id: str, session_id: str, query: str):
+    classifier = Get_Classifier()
     memory_type = classifier.classify(query)
     logging.info(f"Memory Type Classified{memory_type}")
      
@@ -17,6 +14,7 @@ def process_query(user_id: str, session_id: str, query: str):
         return []
 
     # Retrieve relevant memories
+    store = Monogo_Memory()
     memories = store.get_memories_by_type(
         session_id=session_id,
         memory_type=memory_type.value
@@ -32,7 +30,6 @@ def process_query(user_id: str, session_id: str, query: str):
         memory_type=memory_type,
         text=query
     )
-    
     
     store.add_memory(memory.model_dump())
     logging.info(f"New Memory Created {memory}")

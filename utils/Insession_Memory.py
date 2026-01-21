@@ -114,6 +114,7 @@ import json
 import redis
 from models.Response import Response
 import os
+from core.config import settings
 
 
 logger = logging.getLogger(__name__)
@@ -122,10 +123,10 @@ logger = logging.getLogger(__name__)
 class RedisDictSessionStore:
     def __init__(
         self,
-        redis_url: str ,
-        max_items: int ,              # ✅ N = 20
-        ttl_seconds: int ,           # ✅ TTL = 1 hour
-        key_prefix: str 
+        redis_url: str = settings.redis_url ,
+        max_items: int = settings.max_items,              # ✅ N = 20
+        ttl_seconds: int = settings.ttl_seconds ,           # ✅ TTL = 1 hour
+        key_prefix: str = settings.redis_key_prefix
     ):
         self.max_items = max_items
         self.ttl_seconds = ttl_seconds
