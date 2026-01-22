@@ -1,5 +1,7 @@
 import logging
 from typing import List
+
+from fastapi import BackgroundTasks
 from Services.LongTermMemory import Create_memory, process_query
 from Services.memory_services import get_all_start_methods
 from models.LongMemory_Models import Memory
@@ -78,7 +80,7 @@ async def rag_answer(Payload:RagRequest) -> Response | dict:
             user_id= Payload.Session_ID,
             session_id= Payload.Session_ID,
             memory_type = memory_type,
-            text= 'Question: ' + answer.Question + '  ' + "Answer  " +  answer.Saving 
+            text=  'Question: ' + answer.Question + '  ' + "Answer  " + answer.Answer + answer.Saving
         )
         await Create_memory(memory)
     

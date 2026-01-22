@@ -14,6 +14,7 @@ prompt_rag = ChatPromptTemplate.from_messages([
         "3. **Tone & Context:** Use 'User History' to ensure continuity in the conversation.\n"
         "4. **Strictness:** Only say 'The requested information is not available...' if the "
         "answer is missing from ALL provided sections (Article, Memories, and History).\n\n"
+        "5. if user tell u something about something pass remarks for example i want to be an AI Engineer Answer Nice"
         
         "### RULES:\n"
         "- Do not make up facts. Use only the provided data.\n"

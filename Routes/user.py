@@ -34,10 +34,7 @@ async def prompt_with_rag(
         logging.info("RAG prompt endpoint called", extra={"question": question})
         Request = RagRequest(question= question, Session_ID=Session_ID)
         answer = await rag_answer(Request)
-        
         logger.info(f"Answer given by the rag {answer.Saving}")
-        
-        
         # await add_Prompt(answer.model_dump(),Session_ID)
         logging.info(f"The User asked the Question and Answer was {answer}")
         background_tasks.add_task(
