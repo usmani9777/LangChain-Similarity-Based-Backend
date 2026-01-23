@@ -87,7 +87,7 @@ class Memory(BaseModel):
     user_id: Optional[str] = Field(None, min_length=4)
     session_id: str = Field(..., min_length=10, max_length=2000)
     memory_type: MemoryType = Field(...)
-    text: str = Field(..., min_length=5, max_length=1000)
+    text: str = Field(..., min_length=5)
     
     # Store these as integers now
     created_at: int = Field(default_factory=get_now_timestamp)

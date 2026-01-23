@@ -14,6 +14,13 @@ from logging import getLogger
 
 logger = getLogger(__name__)
 parser = PydanticOutputParser(pydantic_object=Response)
+# async def get_rag_chain():
+#     llm = get_llm()
+#     return prompt_rag | llm | parser
+
+# async def get_rag_store():
+#     return initialize_vector_store()
+
 rag_chain = prompt_rag | get_llm() | parser
 rag_store = initialize_vector_store()
 
@@ -63,7 +70,7 @@ async def rag_answer(Payload:RagRequest) -> Response | dict:
             "Answer": "The requested information is not available in the provided documents."
         }
     logger.info(f"Prompt call prompt")
-    redis_query = RedisQuery(user_id=Payload.Session_ID,session_id=Payload.Session_ID,query=Payload.question)
+    redis_query = RedisQuery(user_id=Payload.user_id,session_id=Payload.Session_ID,query=Payload.question)
    
     memory_type , memories = await process_query(redis_query)
     Prompts = await get_all_start_methods(Payload.Session_ID)
@@ -77,10 +84,10 @@ async def rag_answer(Payload:RagRequest) -> Response | dict:
     })
     if (answer.Saving != "" or len(answer.Saving) >= 1) and memory_type != None: 
         memory = Memory(
-            user_id= Payload.Session_ID,
+            user_id= Payload.user_id,
             session_id= Payload.Session_ID,
             memory_type = memory_type,
-            text=  'Question: ' + answer.Question + '  ' + "Answer  " + answer.Answer + answer.Saving
+            text=  'Question: ' + answer.Question + '  ' + "Answer  " + answer.Answer 
         )
         await Create_memory(memory)
     

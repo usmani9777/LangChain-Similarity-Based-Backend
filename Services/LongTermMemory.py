@@ -17,7 +17,7 @@ async def process_query(payload : RedisQuery):
     # Retrieve relevant memories
     store = Monogo_Memory()
     memories = store.get_memories_by_type(
-        session_id=payload.session_id,
+        user_id=payload.user_id,
         memory_type=memory_type.value
     )
     logging.info(f"Retrieved Memory {memories}")

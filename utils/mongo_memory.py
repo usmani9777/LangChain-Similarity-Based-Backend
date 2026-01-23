@@ -33,13 +33,13 @@ class MongoMemoryStore:
     # -------------------------
     def get_memories_by_type(
         self,
-        session_id: str,
+        user_id: str,
         memory_type: str,
         limit: int = 5
     ) -> List[dict]:
         return list(
             self.collection.find(
-                {"session_id": session_id, "memory_type": memory_type}
+                {"user_id": user_id, "memory_type": memory_type}
             )
             .sort("importance", -1)
             .limit(limit)

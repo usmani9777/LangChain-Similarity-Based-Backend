@@ -17,6 +17,8 @@ def get_llm():
         temperature=0,
         timeout=30,
         max_retries=2,
+        streaming=False,
+        callbacks=None # Make sure no callback is passed
     )
     
 @lru_cache
@@ -40,6 +42,7 @@ def Get_redis() -> RedisDictSessionStore:
 @lru_cache
 def Get_Classifier() -> RuleBasedMemoryClassifier:
     return RuleBasedMemoryClassifier()
+
 @lru_cache
 def Monogo_Memory() -> MongoMemoryStore:
     return MongoMemoryStore(settings.mongo_url)
