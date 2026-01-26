@@ -1,0 +1,90 @@
+COMPANY POLICY MANUAL
+Version: 1.0
+Last Updated: January 2026
+
+
+1. INTRODUCTION
+
+This document outlines the official policies and procedures of AcmeTech Solutions.
+All employees, contractors, and affiliates are required to read, understand, and
+comply with the policies described in this manual.
+
+The purpose of these policies is to ensure a safe, productive, ethical, and legally
+compliant workplace environment. Failure to comply may result in disciplinary action,
+including termination of employment.
+
+
+2. CODE OF CONDUCT
+
+Employees are expected to behave professionally at all times. Respect, integrity,
+and accountability form the foundation of our workplace culture.
+
+Unacceptable behavior includes harassment, discrimination, misuse of company
+resources, or any conduct that may harm the company’s reputation. Employees must
+report any violations immediately to Human Resources.
+
+
+3. WORKING HOURS & ATTENDANCE
+
+Standard working hours are from 9:00 AM to 5:00 PM, Monday through Friday.
+Employees are expected to be punctual and adhere to their assigned schedules.
+
+Any absence, delay, or early departure must be communicated to the reporting
+manager in advance. Repeated attendance issues may lead to corrective action.
+
+
+4. DATA PRIVACY & INFORMATION SECURITY
+
+The company is committed to protecting confidential and sensitive information.
+Employees must not share internal data with unauthorized individuals or external
+entities.
+
+Passwords must be kept secure, and company systems should only be accessed for
+authorized business purposes. Any suspected data breach must be reported
+immediately to the IT department.
+
+
+5. REMOTE WORK POLICY
+
+Remote work is permitted subject to managerial approval. Employees working remotely
+must maintain productivity levels equivalent to on-site work.
+
+Company data accessed remotely must follow the same security standards. Public Wi-Fi
+networks should be avoided unless a secure VPN is used.
+
+
+6. USE OF COMPANY ASSETS
+
+Company assets including laptops, software licenses, and office equipment are
+provided strictly for business use.
+
+Employees are responsible for the proper care of assigned assets. Any damage or loss
+must be reported promptly.
+
+
+7. HEALTH & SAFETY
+
+The company strives to maintain a safe working environment. Employees must comply
+with all safety regulations and report hazardous conditions immediately.
+
+Emergency exits, fire equipment, and first-aid kits must not be obstructed or misused.
+
+
+8. TERMINATION & EXIT PROCEDURES
+
+Upon termination or resignation, employees must return all company property.
+Access to company systems will be revoked on the last working day.
+
+Exit interviews may be conducted to gather feedback and ensure a smooth transition.
+
+
+9. POLICY UPDATES
+
+The company reserves the right to modify these policies at any time. Employees will be
+notified of significant changes through official communication channels.
+
+Continued employment implies acceptance of updated policies.
+
+
+END OF DOCUMENT
+
