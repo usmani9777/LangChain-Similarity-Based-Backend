@@ -1,11 +1,10 @@
 import logging
-from typing import List, Union
+from typing import List
 
 from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 from langchain_core.output_parsers import PydanticOutputParser
 
 from models.Query_Payload import RagRequest, RedisQuery
-from models.LongMemory_Models import Memory
 from models.Response import Response
 from core.prompt import SYSTEM_PROMPT
 from core.dependecies import get_llm

@@ -16,8 +16,8 @@ class Response(BaseModel):
     # Saving: str = Field(...,description="Classify whether the question or answer contains long-term memory. Must be one of: 'Personal', 'Goal','Fact' or 'None'")
     Question : str = Field(...,description="Question Asked by User")
     # Article_Summary:str = Field(..., description="Summary of the article related to the query")
-    Article:str = Field(..., description="Data from article related to the given query")
-    Answer:str = Field(..., description="Answer to the query based on the Data you are Provided")
+    Article:str = Field(..., description="Data from article related to the given query and memory that u have retrieved")
+    Answer:str = Field(..., description="Answer to the query as defined")
 
 class Session_stats(BaseModel):
     Session_ID :str

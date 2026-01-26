@@ -1,5 +1,6 @@
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query,Depends
 from Services.Agentic_rag import rag_agentic_orchestrated
+from Services.agent_executor import rag_agentic_executor
 from models.Response import Response
 from Services.memory_services import add_Prompt,get_session_id
 from Services.Rag import rag_answer, retrieve_context
@@ -129,3 +130,37 @@ async def retrieval_check(
             status_code=500,
             detail=f"Retrieval failed: {str(e)}"
         )
+
+
+
+@router.post("/prompt/Agentic_rag_Executor" )
+async def Agentic_rag(  
+    background_tasks: BackgroundTasks,
+    Payload: RAGRequest_Endpoint,
+    Session_ID: str = Depends(get_session_id),
+    
+    
+):
+    try:
+        
+        logging.info("RAG prompt endpoint called", extra={"question": Payload.question})
+        Request = RagRequest(question= Payload.question, Session_ID=Session_ID ,user_id=Payload.user_id)
+        answer = await rag_agentic_executor(Request)
+        # logger.info(f"Answer given by the rag {answer.Saving}")
+        # await add_Prompt(answer.model_dump(),Session_ID)
+        logging.info(f"The User asked the Question and Answer was {answer}")
+        background_tasks.add_task(
+                add_Prompt,
+                answer.model_dump(),
+                Session_ID)
+        return answer
+            
+    except Exception as e:
+        logging.exception("RAG processing failed", extra={"error": str(e)})
+        raise HTTPException(
+            status_code=500,
+            detail=f"RAG processing failed: {str(e)}"
+        )
+
+
+

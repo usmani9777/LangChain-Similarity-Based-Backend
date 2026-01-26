@@ -1,17 +1,16 @@
 from fastapi import Request
-from models.LongMemory_Models import Create_Memory, Memory
-from core.dependecies import Get_Classifier, Monogo_Memory
+from models.LongMemory_Models import Memory
+from core.dependecies import Monogo_Memory
 import logging
-from models.Query_Payload import RedisQuery
 from langchain.tools import tool
 from typing import List
-
+from langchain_core.runnables import RunnableConfig
 
 logger = logging.getLogger(__name__)
 
 
 @tool
-def retrieve_memories(user_id: str, memory_type: str) -> List[str]:
+def retrieve_memories_config( memory_type: str ,config: RunnableConfig = None) -> List[str]:
     """
     Retrieve stored memories of a specific type for a given user.
 
@@ -34,14 +33,16 @@ def retrieve_memories(user_id: str, memory_type: str) -> List[str]:
     try:
         # Initialize memory store
         store = Monogo_Memory()
+        uid = config["configurable"].get("user_id",'User_Default')
+        sid = config["configurable"].get("session_id",'Session_Default_123456789')
         
         # Fetch memories of the given type
         memories = store.get_memories_by_type(
-            user_id=user_id,
+            user_id=uid,
             memory_type=memory_type
         )
         print('Memorys Retrieved:', memories)
-        logging.info(f"[MemoryTool] Retrieved {len(memories)} memories for user '{user_id}' of type '{memory_type}'")
+        logging.info(f"[MemoryTool] Retrieved {len(memories)} memories for user '{uid}' of type '{memory_type}'")
         
         # Extract text from memories
         memory_texts = [m.get("text", "") for m in memories if "text" in m]
@@ -55,7 +56,7 @@ def retrieve_memories(user_id: str, memory_type: str) -> List[str]:
 
 
 @tool
-def save_memory(user_id: str, session_id: str, memory_type: str, text: str) -> str:
+def save_memory_config(memory_type: str, text: str,config: RunnableConfig = None) -> str:
     """
     Save a memory object to the long-term memory store.
 
@@ -76,9 +77,21 @@ def save_memory(user_id: str, session_id: str, memory_type: str, text: str) -> s
     try:
        
         store = Monogo_Memory()
+        
+        # Check if config is None or missing 'configurable'
+        if config is None or "configurable" not in config:
+            # If config is missing, we use defaults so the code doesn't crash
+            uid = 'User_Default'
+            sid = get_session_id()
+            logger.warning("[MemoryTool] No config/user_id found. Using defaults.")
+        else:
+            # Safe access using .get()
+            configurable = config.get("configurable", {})
+            uid = configurable.get("user_id", 'User_Default')
+            sid = get_session_id()
         memory = Memory(
-            user_id=user_id,
-            session_id= session_id,
+            user_id=uid,
+            session_id= sid,
             memory_type=memory_type,
             text=text
          )
