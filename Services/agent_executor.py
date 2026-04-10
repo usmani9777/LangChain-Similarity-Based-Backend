@@ -146,7 +146,7 @@ import logging
 import json
 from typing import List
 
-from langchain_classic.agents import AgentExecutor, create_openai_functions_agent, create_tool_calling_agent
+from langchain_classic.agents import AgentExecutor, create_openai_functions_agent, create_tool_calling_agent,initialize_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import PydanticOutputParser
 from models.Query_Payload import RagRequest

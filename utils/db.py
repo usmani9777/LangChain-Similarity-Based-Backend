@@ -185,17 +185,3 @@ class TextRAGVectorStore:
                 List: List of retrieved documents"""
         return self.retriever.invoke(question)
     
-# if __name__ == "__main__":
-#     rag = TextRAGVectorStore(
-#         paths=["file.txt"],
-#         rebuild=True
-#     )
-    
-      
-#     rag.add_data("file1.txt")
-#     rag.add_data("file2.txt")
-    
-#     results = rag.query("What is Code of conduct?")
-#     for i, r in enumerate(results, 1):
-#         print(f"\nResult {i}:\n{r.page_content}")
-      
