@@ -1,0 +1,29 @@
+// {
+//     "configurations": [
+//     {
+//         "name": "Fast API Rag",
+//         "type": "debugpy",
+//         "request": "launch",
+//         "source": "${workspaceFolder}/src/main.py"    
+//     }
+//     ]
+// }
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "FastAPI: Debug App",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "main:app", // Replace 'main' with your filename and 'app' with your FastAPI instance name
+                "--host", "0.0.0.0",
+                "--port", "8000",
+                "--reload"
+            ],
+            "jinja": true,
+            "justMyCode": true
+        }
+    ]
+}
